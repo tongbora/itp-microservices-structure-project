@@ -1,0 +1,3 @@
+service:
+  name: Account Service (Development)
+  version: 1.0 snapshot

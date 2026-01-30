@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.42/8365263844ebb62398e0dc33057ba10ba472d3b8/lombok-1.18.42.jar" />
+        </processorPath>
+        <module name="gateway-server.main" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="co.istad.ipt-spring-authorization-server" target="21" />
+      <module name="co.istad.ipt-spring-authorization-server.main" target="21" />
+      <module name="co.istad.ipt-spring-authorization-server.test" target="21" />
+      <module name="com.tongbora.ipt-spring-authorization-server" target="21" />
+      <module name="com.tongbora.ipt-spring-authorization-server.main" target="21" />
+      <module name="com.tongbora.ipt-spring-authorization-server.test" target="21" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="account-service" options="-parameters" />
+      <module name="account-service.main" options="-parameters" />
+      <module name="account-service.test" options="-parameters" />
+      <module name="co.istad.ipt-spring-authorization-server" options="-parameters" />
+      <module name="co.istad.ipt-spring-authorization-server.main" options="-parameters" />
+      <module name="co.istad.ipt-spring-authorization-server.test" options="-parameters" />
+      <module name="com.tongbora.ipt-spring-authorization-server" options="-parameters" />
+      <module name="com.tongbora.ipt-spring-authorization-server.main" options="-parameters" />
+      <module name="com.tongbora.ipt-spring-authorization-server.test" options="-parameters" />
+      <module name="customer-service" options="-parameters" />
+      <module name="customer-service.main" options="-parameters" />
+      <module name="customer-service.test" options="-parameters" />
+      <module name="eureka-server" options="-parameters" />
+      <module name="eureka-server.main" options="-parameters" />
+      <module name="eureka-server.test" options="-parameters" />
+      <module name="front-bff" options="-parameters" />
+      <module name="front-bff-for-admin" options="-parameters" />
+      <module name="front-bff-for-admin.main" options="-parameters" />
+      <module name="front-bff-for-admin.test" options="-parameters" />
+      <module name="front-bff.main" options="-parameters" />
+      <module name="front-bff.test" options="-parameters" />
+      <module name="gateway-server" options="-parameters" />
+      <module name="gateway-server.main" options="-parameters" />
+      <module name="gateway-server.test" options="-parameters" />
+      <module name="ipt-spring-authorization-server" options="-parameters" />
+      <module name="ipt-spring-authorization-server.main" options="-parameters" />
+      <module name="ipt-spring-authorization-server.test" options="-parameters" />
+      <module name="itp-config-server" options="-parameters" />
+      <module name="itp-config-server.main" options="-parameters" />
+      <module name="itp-config-server.test" options="-parameters" />
+      <module name="pipeline-service" options="-parameters" />
+      <module name="pipeline-service.main" options="-parameters" />
+      <module name="pipeline-service.test" options="-parameters" />
+    </option>
+  </component>
+</project>

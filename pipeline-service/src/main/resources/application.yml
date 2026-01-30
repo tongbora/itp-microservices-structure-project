@@ -1,0 +1,64 @@
+eureka:
+  instance:
+    instance-id: ${spring.application.name}
+    prefer-ip-address: true
+
+server:
+  port: 20262
+
+spring:
+  application:
+    name: pipeline
+  profiles:
+    active: dev
+  config:
+    import: optional:configserver:http://localhost:8888
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+
+  # Configure OAuth2 Client for Gateway Server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090
+      client:
+        provider:
+          itp-standard:
+            issuer-uri: http://localhost:9090
+        registration:
+          itp-standard:
+            provider: itp-standard
+            client-id: itp-standard
+            client-secret: qwerqwer
+            redirect-uri: http://localhost:9999/login/oauth2/code/itp-standard
+            authorization-grant-type: client_credentials
+            scope:
+              - openid # Auto issue access token
+              - profile # Get profile
+              - email # Get email
+
+# Resilience4j configuration
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        sliding-window-size: 10
+        failure-rate-threshold: 50 # Percentage
+        permitted-number-of-calls-in-half-open-state: 2 # this mean that we need to have 2 successful calls to close the circuit
+        wait-duration-in-open-state: 10000 #
+#    instances:
+#      accountCircuitBreaker:
+#        base-config: default
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

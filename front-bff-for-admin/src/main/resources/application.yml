@@ -1,0 +1,56 @@
+eureka:
+  instance:
+    instance-id: ${spring.application.name}
+    prefer-ip-address: true
+
+server:
+  port: 9991
+
+spring:
+  application:
+    name: front-bff-for-admin
+  profiles:
+    active: dev
+  config:
+    import: optional:configserver:http://localhost:8888
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          # Static Route Configuration
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Request-Headers
+            - SaveSession
+            - TokenRelay=
+          routes:
+            - id: itp-standard-route
+              uri: http://localhost:3000
+              predicates:
+                - Path=/**
+
+  # Configure OAuth2 Client for Gateway Server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090
+      client:
+        provider:
+          itp-frontbff-for-admin:
+            issuer-uri: http://localhost:9090
+        registration:
+          itp-frontbff-for-admin:
+            provider: itp-frontbff-for-admin
+            client-id: itp-frontbff-for-admin
+            client-secret: qwerqwer
+            redirect-uri: http://localhost:9991/login/oauth2/code/itp-frontbff-for-admin
+            authorization-grant-type:
+              - authorization_code
+            scope:
+              - openid # Auto issue access token
+              - profile # Get profile
+              - email # Get email
