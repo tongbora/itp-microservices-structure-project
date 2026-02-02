@@ -32,13 +32,16 @@ public class ResponseCacheFilterConfig implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
-        // /pipeline-service/client/account/secured
-        String path = exchange.getRequest().getPath().value();
-
         // Only cache GET requests
         if (!"GET".equals(exchange.getRequest().getMethod().name())) {
             return chain.filter(exchange);
         }
+
+        // 1. USE EXCHANGE to get request info
+
+        // /pipeline/api/v1/accounts
+        String path = exchange.getRequest().getPath().value();
+
 
         // Skip caching for certain paths
         if (path.contains("/actuator") || path.contains("/fallback")) {
@@ -49,8 +52,12 @@ public class ResponseCacheFilterConfig implements GlobalFilter, Ordered {
 
         String cacheKey = path;
 
+        // 2. USE EXCHANGE to get original response
+
         ServerHttpResponse originalResponse = exchange.getResponse();
         DataBufferFactory bufferFactory = originalResponse.bufferFactory();
+
+        // 3. MODIFY EXCHANGE with decorated response
 
         ServerHttpResponseDecorator decoratedResponse = new ServerHttpResponseDecorator(originalResponse) {
             @Override
@@ -79,6 +86,7 @@ public class ResponseCacheFilterConfig implements GlobalFilter, Ordered {
             }
         };
 
+        // 4. PASS MODIFIED EXCHANGE to next filter via CHAIN
         return chain.filter(exchange.mutate().response(decoratedResponse).build());
     }
 
