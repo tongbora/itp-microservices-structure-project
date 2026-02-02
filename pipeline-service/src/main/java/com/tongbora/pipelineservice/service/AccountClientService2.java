@@ -2,29 +2,24 @@ package com.tongbora.pipelineservice.service;
 
 import com.tongbora.pipelineservice.client.account.AccountClient;
 import com.tongbora.pipelineservice.client.account.dto.AccountResponse;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AccountService3 {
+public class AccountClientService2 {
 
     private final AccountClient accountClient;
-    private final CircuitBreakerFactory circuitBreakerFactory;
 
+    @CircuitBreaker(name = "accountCircuitBreaker", fallbackMethod = "fallback")
     public AccountResponse getAccountInfo() {
-        return circuitBreakerFactory.create("accountCircuitBreaker").run(
-                () -> accountClient.getAccountInfo(),
-                throwable -> fallback(throwable)
-        );
+        return accountClient.getAccountInfo();
     }
 
     private AccountResponse fallback(Throwable throwable) {
-        // Log the error
         System.err.println("Circuit breaker fallback triggered: " + throwable.getMessage());
 
-        // Return fallback response
         return AccountResponse.builder()
                 .accountId("000")
                 .accountName("Fallback Account")

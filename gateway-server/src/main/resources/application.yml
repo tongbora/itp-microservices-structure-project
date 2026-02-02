@@ -30,6 +30,11 @@ spring:
             locator:
               enabled: false
               lower-case-service-id: true
+
+          httpclient:
+            connect-timeout: 1000
+            response-timeout: 5s
+
           # Load Balancer and route Configuration
           routes:
             # Account Service Route with Circuit Breaker
@@ -51,10 +56,21 @@ spring:
                 - Path=/pipeline/**
               filters:
                 - RewritePath=/pipeline/(?<segment>.*), /$\{segment}
-                - name: CircuitBreaker
+                - name: Retry
                   args:
-                    name: pipelineCircuitBreaker
-                    fallbackUri: forward:/fallback/pipeline/api/v1/accounts
+                    retries: 5
+                    statuses: BAD_GATEWAY
+                    methods: GET
+                    backoff:
+                      firstBackoff: 10ms
+                      maxBackoff: 50ms
+                      factor: 2
+                      basedOnPreviousValue: false
+
+  #                - name: CircuitBreaker
+#                  args:
+#                    name: pipelineCircuitBreaker
+#                    fallbackUri: forward:/fallback/pipeline/api/v1/accounts
 
   # Configure OAuth2 Client for Gateway Server
   security:
