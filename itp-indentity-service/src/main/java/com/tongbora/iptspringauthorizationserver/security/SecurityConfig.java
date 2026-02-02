@@ -107,7 +107,6 @@ public class SecurityConfig {
                 )
 //                .logout(
 //                        logout -> logout.logoutSuccessUrl("/")
-//                )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
