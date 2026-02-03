@@ -14,6 +14,7 @@ spring:
   config:
     import: optional:configserver:http://localhost:8888
   cloud:
+    # Auto Create Gateway Routes from Eureka Service Registry
     gateway:
       server:
         webflux:
@@ -21,6 +22,33 @@ spring:
             locator:
               enabled: true
               lower-case-service-id: true
+
+    # Configure Spring Cloud Stream with Kafka Binder
+    # Defines three function beans that Spring Cloud Stream will bind to messaging channels
+    # These functions should exist as @Bean methods in Spring application
+    function:
+      definition: processProduct;processMessage;processProductDetail
+    stream:
+      bindings:
+        processProduct-in-0:
+          destination: test-product # Kafka topic that this function will consume from
+          group: monitor-group # consumer_group_id
+          content-type: application/json
+        processMessage-in-0:
+          destination: test-topic # Kafka topic that this function will consume from
+        processProductDetail-in-0:
+          destination: product-detail # Kafka topic that this function will consume from
+          group: monitor-group2 # consumer_group_id
+          content-type: application/json
+        processProductDetail-out-0:
+          destination: processed-product-detail # Kafka topic that this function will produce to
+          content-type: application/json
+      kafka:
+        binder:
+          brokers: localhost:29092,localhost:29094,localhost:29096
+          configuration:
+            auto.offset.reset: earliest
+
 
   # Configure OAuth2 Client for Gateway Server
   security:
