@@ -44,10 +44,12 @@ spring:
               - Path=/account/**
               filters:
               - RewritePath=/account/(?<segment>.*), /$\{segment}
-              - name: CircuitBreaker
+              - name: RequestRateLimiter
                 args:
-                  name: accountCircuitBreaker
-                  fallbackUri: forward:/fallback/account
+                  redis-rate-limiter.replenishRate: 2
+                  redis-rate-limiter.burstCapacity: 5
+                  redis-rate-limiter.requestedTokens: 1
+                  key-resolver: "#{@userKeyResolver}"
 
             # Pipeline Service Route with Circuit Breaker
             - id: pipeline

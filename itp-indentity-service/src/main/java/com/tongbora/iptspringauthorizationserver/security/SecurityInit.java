@@ -78,7 +78,7 @@ public class SecurityInit {
                 .build();
 
         ClientSettings clientSettings = ClientSettings.builder()
-                .requireProofKey(true)
+                .requireProofKey(false)
                 .requireAuthorizationConsent(false)
                 .build();
 
