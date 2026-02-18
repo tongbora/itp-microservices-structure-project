@@ -15,11 +15,11 @@ spring:
     import: optional:configserver:http://localhost:8888
 
   # Redis Configuration
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      password: qwer
+#  data:
+#    redis:
+#      host: localhost
+#      port: 6379
+#      password: qwer
 
   # Auto Create Gateway Routes from Eureka Service Registry
   cloud:
@@ -44,12 +44,12 @@ spring:
               - Path=/account/**
               filters:
               - RewritePath=/account/(?<segment>.*), /$\{segment}
-              - name: RequestRateLimiter
-                args:
-                  redis-rate-limiter.replenishRate: 2
-                  redis-rate-limiter.burstCapacity: 5
-                  redis-rate-limiter.requestedTokens: 1
-                  key-resolver: "#{@userKeyResolver}"
+#              - name: RequestRateLimiter
+#                args:
+#                  redis-rate-limiter.replenishRate: 2
+#                  redis-rate-limiter.burstCapacity: 5
+#                  redis-rate-limiter.requestedTokens: 1
+#                  key-resolver: "#{@userKeyResolver}"
 
             # Pipeline Service Route with Circuit Breaker
             - id: pipeline
@@ -58,11 +58,11 @@ spring:
                 - Path=/pipeline/**
               filters:
                 - RewritePath=/pipeline/(?<segment>.*), /$\{segment}
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 10
-                    redis-rate-limiter.burstCapacity: 20
-                    redis-rate-limiter.requestedTokens: 1
+#                - name: RequestRateLimiter
+#                  args:
+#                    redis-rate-limiter.replenishRate: 10
+#                    redis-rate-limiter.burstCapacity: 20
+#                    redis-rate-limiter.requestedTokens: 1
 
 
 # Retry Filter        Example

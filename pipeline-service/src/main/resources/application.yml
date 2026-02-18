@@ -1,61 +1,83 @@
-eureka:
-  instance:
-    instance-id: ${spring.application.name}
-    prefer-ip-address: true
-
 server:
   port: 20262
-
 spring:
   application:
     name: pipeline
+
   profiles:
     active: dev
   config:
     import: optional:configserver:http://localhost:8888
   cloud:
-    # Auto Create Gateway Routes from Eureka Service Registry
-    gateway:
-      server:
-        webflux:
-          discovery:
-            locator:
-              enabled: true
-              lower-case-service-id: true
-
-    # Configure Spring Cloud Stream with Kafka Binder
-    # Defines three function beans that Spring Cloud Stream will bind to messaging channels
-    # These functions should exist as @Bean methods in Spring application
     function:
-      definition: processProduct;processMessage;processProductDetail
+      definition: processProduct;processMessage;processProductDetail;processDebeziumProduct;captureEnvelope;consumeDbzEvent
     stream:
       bindings:
         processProduct-in-0:
-          destination: test-product # Kafka topic that this function will consume from
+          destination: test-product # topic_name
           group: monitor-group # consumer_group_id
           content-type: application/json
+        captureEnvelope-in-0:
+          destination: ITP.CORE_BANKING.RECORD_XML # topic_name
+          group: monitor-group-02 # consumer_group_id
+        consumeDbzEvent-in-0:
+          destination: ITP.CORE_BANKING.RECORD_XML
+          group: record_xml_1
+        consumeDbzEvent-out-0:
+          destination: cleaned_record
+          content-type: application/json
         processMessage-in-0:
-          destination: test-topic # Kafka topic that this function will consume from
+          destination: test-topic
         processProductDetail-in-0:
-          destination: product-detail # Kafka topic that this function will consume from
-          group: monitor-group2 # consumer_group_id
+          destination: consume-product-detail # topic_name
+          group: monitor-group-detail # consumer_group_id
           content-type: application/json
         processProductDetail-out-0:
-          destination: processed-product-detail # Kafka topic that this function will produce to
+          destination: producer-product-detail # topic_name
           content-type: application/json
+        #        processMessage-out-0:
+        #          destination: processed-messages-topic
+
+        # NEW: Debezium CDC consumer with Avro
+        processDebeziumProduct-in-0:
+          destination: postgres_product.public.products
+          group: debezium-consumer-group
+          content-type: application/*+avro  # Changed from application/json
+          consumer:
+            use-native-decoding: true  # Important: Use native Kafka deserialization
       kafka:
         binder:
           brokers: localhost:29092,localhost:29094,localhost:29096
           configuration:
             auto.offset.reset: earliest
+            schema.registry.url: http://localhost:8081
+        bindings:
+          # Avro-specific configuration for Debezium consumer
+          processDebeziumProduct-in-0:
+            consumer:
+              configuration:
+                key.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+                value.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+                schema.registry.url: http://localhost:8081
+                specific.avro.reader: false
+          captureEnvelope-in-0:
+            consumer:
+              configuration:
+                key.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+                value.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+                schema.registry.url: http://localhost:8081
+                specific.avro.reader: true
+          consumeDbzEvent-in-0:
+            consumer:
+              configuration:
+                key.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+                value.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+                schema.registry.url: http://localhost:8081
+                specific.avro.reader: false
 
 
-  # Configure OAuth2 Client for Gateway Server
   security:
     oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:9090
       client:
         provider:
           itp-standard:
@@ -67,30 +89,38 @@ spring:
             client-secret: qwerqwer
             redirect-uri: http://localhost:9999/login/oauth2/code/itp-standard
             authorization-grant-type: client_credentials
+            #              - authorization_code
+            #              - client_credentials
             scope:
               - openid # Auto issue access token
               - profile # Get profile
               - email # Get email
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090
 
-# Resilience4j configuration
-resilience4j:
-  circuitbreaker:
-    configs:
-      default:
-        sliding-window-size: 10
-        failure-rate-threshold: 50 # Percentage
-        permitted-number-of-calls-in-half-open-state: 2 # this mean that we need to have 2 successful calls to close the circuit
-        wait-duration-in-open-state: 10000 #
+# Resilience4j
+#resilience4j:
+#  circuitbreaker:
+#    configs:
+#      default:
+#        sliding-window-size: 10 # Number of requests
+#        failure-rate-threshold: 50 # Percentage of 50%
+#        permitted-number-of-calls-in-half-open-state: 2 # Number of requests before change ot half-open
+#        wait-duration-in-open-state: 10000
 #    instances:
-#      accountCircuitBreaker:
+#      accountService:
 #        base-config: default
 
+# Actuator (add this if not present)
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-
+#  health:
+#    circuitbreakers:
+#      enabled: true
 logging:
   level:
-    com.tongbora.pipelineservice: DEBUG
+    co.istad.dara.pipeline_service: DEBUG

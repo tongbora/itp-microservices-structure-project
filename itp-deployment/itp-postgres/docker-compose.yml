@@ -5,6 +5,16 @@ services:
     environment:
       POSTGRES_USER: itpusr
       POSTGRES_PASSWORD: itp@168
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "max_replication_slots=10"
+      - "-c"
+      - "max_wal_senders=10"
+      - "-c"
+      - "max_worker_processes=10"
     ports:
       - "16851:5432"
     volumes:
@@ -31,4 +41,4 @@ volumes:
 
 networks:
     itp-net:
-
+      external: true

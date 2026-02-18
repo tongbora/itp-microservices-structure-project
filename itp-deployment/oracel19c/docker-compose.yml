@@ -8,14 +8,17 @@ services:
       ORACLE_PWD: Oracle@168
       ENABLE_ARCHIVELOG: true
     volumes:
+      - ./init_scripts:/opt/oracle/scripts/startup
       - oracle_data_itp:/opt/oracle/oradata
       - oracle_fra:/opt/oracle/fast_recovery_area
+      - oracle_recovery_itp:/opt/oracle/oradata/recovery_area 
     networks:
       - itp-net
 
 volumes:
   oracle_data_itp:
-
+  oracle_fra:
+  oracle_recovery_itp:
 networks:
   itp-net:
     external: true

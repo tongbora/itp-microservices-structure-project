@@ -1,0 +1,29 @@
+services:
+  postgres-itp-test:
+    image: debezium/postgres:15
+    container_name: postgres-itp
+    ports:
+      - "5400:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: productdb
+      # These should be set by the debezium/postgres image, but let's be explicit
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    # Don't override the command - debezium/postgres already sets it correctly
+    volumes:
+      - postgres_data_itp:/var/lib/postgresql/data
+    networks:
+      - itp-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  itp-net:
+    driver: bridge
+
+volumes:
+  postgres_data_itp:
